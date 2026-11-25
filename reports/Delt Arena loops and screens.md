@@ -162,7 +162,7 @@ In tap mode the app takes no action on its own. The whole centre, everything bet
 | Gesture | Result | Feedback |
 |---|---|---|
 | Tap anywhere in the centre | Logs exactly the shown weight, reps and effort; rest starts at once | Stamp haptic; the numbers morph into a square stamp that slides into the strip |
-| Press and hold anywhere in the centre (about 400ms) | Raises the Thumb keypad from the bottom edge, prefilled with the prediction | Detent haptic as the sheet starts to rise |
+| Press and hold anywhere in the centre (400ms, set explicitly because Flutter's default is 500ms) | Raises the Thumb keypad from the bottom edge, prefilled with the prediction | Detent haptic as the sheet starts to rise |
 | Tap one half (split mode) | Logs that half's outcome | Stamp haptic; the other half fades |
 | Tap the Undo chip that appears for 8 seconds after a log | Removes the last set and restores the prediction | Short single pulse |
 | A second tap within 3 seconds of a log | Ignored; shows "Already logged" with Undo | None |
@@ -266,7 +266,7 @@ The question budget is a design judgement with no study behind it: one question 
 
 A global control in Settings switches the first level off ("Ask before changing weights"), which follows HAX guideline 17 on global controls. Whoop lets users turn its coach off entirely ([Whoop](https://www.whoop.com/us/en/press-center/whoop-unveils-the-new-whoop-coach-powered-by-openai/)); Delt Arena offers the same, leaving the logger, the program and the stats working without the AI layer. Oura lets users review and delete what its advisor remembers ([Oura](https://ouraring.com/blog/oura-advisor)); Delt Arena's Settings has a "What the coach knows" list (goal, injuries, equipment, answers to past questions) where each item can be removed.
 
-Auto-progression of load is also where the evidence is most comfortable. Progression by reps in reserve performed at least as well as fixed percentages in the study cited by the earlier concept ([Helms 2018](https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2018.00247/pdf)), and self-reported RIR is usually within about one rep of the truth ([Stronger by Science](https://www.strongerbyscience.com/reps-in-reserve)), which is accurate enough to drive one-increment changes.
+Auto-progression of load is also where the evidence is most comfortable. Progression by reps in reserve performed at least as well as fixed percentages in the study cited by the earlier concept ([Helms 2018](https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2018.00247/pdf)), and a Stronger by Science article says self-reported RIR is usually within about one rep of the truth ([Stronger by Science](https://www.strongerbyscience.com/reps-in-reserve)). That is a web article, not a paper, so a primary validation study (Emanuel 2022, PubMed 36273064, is a candidate) should be checked before the claim is used to justify one-increment changes.
 
 ### Showing the reasoning
 
@@ -330,7 +330,7 @@ The Read loop exists to answer five questions: did this week work, is each lift 
 | Heart rate and load | Zones by % of max heart rate; Edwards training load = sum of minutes in each of five zones × weights 1 to 5; Banister TRIMP (duration × heart-rate-reserve fraction × exponential weighting) as an option ([Hull repository](https://hull-repository.worktribe.com/OutputFile/443111)) | Stacked zone bar per session; weekly load against the user's own 4-week average | A heads-up (never a block) when weekly load jumps well above the 4-week average, since the evidence for a hard cut-off is disputed ([Gabbett 2016](https://bjsm.bmj.com/content/50/5/273.abstract), [Sedeaud 2020](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7485291/)) |
 | Body: bodyweight trend | Exponentially weighted trend, T(n) = T(n−1) + 0.1 × (W(n) − T(n−1)), as in The Hacker's Diet ([Fourmilab](https://fourmilab.ch/hackdiet/www/subsection1_4_1_0_8.html)), with the 0.1 scaled for days between weigh-ins (design judgement); weekly rate as % of bodyweight | Raw weigh-ins as faint dots, trend as a line; rate on a Scale against the goal band | Notes when the rate sits outside the goal band for 3 weeks; for fat loss with falling strength, proposes holding volume and checks protein |
 | Body: goal rate bands | Fat loss about 0.5 to 1% of bodyweight per week; lean gain about 0.25 to 0.5% per week; recomposition near maintenance. These come from physique-athlete reviews and are weakly sourced for the general population ([Helms 2014](https://pmc.ncbi.nlm.nih.gov/articles/PMC4033492), [Iraki 2019](https://pubmed.ncbi.nlm.nih.gov/31247944/)) | Band on the rate Scale | As above |
-| Body: protein | Info only: 1.6 g per kg per day, the point beyond which a meta-regression found no further muscle gain ([Morton 2018](https://pubmed.ncbi.nlm.nih.gov/28698222/)); the ISSN range is 1.4 to 2.0 g/kg ([ISSN](https://pubmed.ncbi.nlm.nih.gov/28642676/)) | Single number with band on the Body screen | Insight card, never a meal plan |
+| Body: protein | Info only: 1.6 g per kg per day, the point beyond which a meta-regression found no further gain in fat-free mass from protein supplementation ([Morton 2018](https://pubmed.ncbi.nlm.nih.gov/28698222/)); the ISSN range is 1.4 to 2.0 g/kg ([ISSN](https://pubmed.ncbi.nlm.nih.gov/28642676/)) | Single number with band on the Body screen | Insight card, never a meal plan |
 | Recovery | From Health Connect: last night's sleep against the user's 28-day median; resting heart rate and HRV (RMSSD) as deviations from the user's 28-day baseline. Three separate deltas, no composite score, because commercial readiness scores use unpublished weights and draw criticism ([the5krunner](https://the5krunner.com/2025/08/19/garmin-body-battery-slammed-indirectly-by-altini-made-up-scores/)) | Three small Scales with the baseline band; data source and time of last sync | When two of the three are adverse for 3 or more days, offers a lighter session (one tap); never changes anything automatically |
 
 Health Connect provides the recovery inputs as separate types (SleepSession, RestingHeartRate, HeartRateVariabilityRmssd and others), each with its own read permission, and reading data older than 30 days needs the separate history permission ([HC data types](https://developer.android.com/health-and-fitness/health-connect/data-types)). The Recovery screen therefore asks for permissions only when opened, and its empty state names the missing source ("Connect a watch or ring that writes sleep to Health Connect").
@@ -394,10 +394,10 @@ Weekly sets start at the lower half of the band and rise over a mesocycle. More 
 | Strength | 3 to 6 on main lifts / 8 to 12 accessories | 8 to 14 | 2 sessions, away from heavy leg days | Direct sets counted for main lifts |
 | Fat loss | 6 to 12 / 10 to 15 | 10 to 14 (keep the stimulus) | Up to WHO band | Body rate band 0.5 to 1% per week |
 | Recomposition | 6 to 12 / 10 to 20 | 10 to 16 | 2 to 3 sessions | Best suited to new and returning lifters (weakly sourced) |
-| Maintain muscle | 6 to 12 / 10 to 15 | 4 to 8, 1 to 2 sessions per muscle | User's choice | Reduced doses maintained muscle in young adults but not in older adults in one trial ([PubMed 21131862](https://pubmed.ncbi.nlm.nih.gov/21131862/)), so users over 60 keep more volume |
+| Maintain muscle | 6 to 12 / 10 to 15 | 4 to 8, 1 to 2 sessions per muscle | User's choice | Reduced doses maintained muscle in young adults but not in older adults in one trial ([PubMed 21131862](https://pubmed.ncbi.nlm.nih.gov/21131862/)), so older users keep more volume as a precaution; the age cut-off is untested design judgement |
 | General fitness | 8 to 15 | 6 to 10 | WHO band of 150 to 300 moderate minutes ([BJSM](https://bjsm.bmj.com/content/54/24/1451)) | Whole-body template |
 
-Deloads are scheduled every 5 to 7 weeks or proposed reactively; a Delphi consensus defines a deload as a period of reduced training to manage fatigue, and coaches most often use one week ([PMC10511399](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10511399/)). The interval and the reduction (about half the sets at the same load) are judgement.
+Deloads are scheduled every 5 to 7 weeks or proposed reactively; a Delphi consensus defines a deload as a period of reduced training to manage fatigue, and the earlier notes say coaches most often use one week, though the abstract checked in the second pass does not state that ([PMC10511399](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC10511399/)). The interval and the reduction (about half the sets at the same load) are judgement.
 
 ### Warnings for user-built programs
 
@@ -411,7 +411,7 @@ The Program editor shows each muscle's weekly fractional sets on a Scale at the 
 | Frequency | A goal muscle trained on only one day | "Back is trained once a week. Twice a week did better in studies with the same total sets." |
 | Rest days | No rest day in 7, or the same muscle hard on consecutive days | "Legs are trained hard on Monday and Tuesday." |
 | Imbalance | Quads over band while hamstrings under, or push more than twice pull | "Quads 22 sets, hamstrings 6." (no ratio target claimed) |
-| Effort | Every set to failure | "All sets go to failure. Leaving 1 to 3 reps gives nearly the same growth with less fatigue." |
+| Effort | Every set to failure | "All sets go to failure. Leaving 1 to 3 reps made only a trivial difference to growth in the studies reviewed." |
 | Cardio spike | Planned weekly cardio well above the last 4 weeks' average | "Cardio doubles this week. Consider building up over a few weeks." |
 
 ## Eight moments, walked through step by step
@@ -511,6 +511,71 @@ The design judgements are the Tolerance language and all of its values; the scre
 | Pricing and paywall placement | Not in scope of the notes beyond competitor prices (Hevy about $24 a year, Fitbod about $96, Gravl $60 to $90) ([Hevy help](https://help.hevyapp.com/hc/en-us/articles/35119778922263), [SensAI](https://www.sensai.fit/blog/gravl-app-review-2026)) | Business decision |
 | Android market share and device tiers in target markets | Performance budget | StatCounter or Play Console data |
 | Play "Best of" and Material Design Award traits | Flagship benchmarks | Primary pages once reachable |
+
+## Second research pass
+
+A second pass sent eight read-only sessions into the user's own browser to close the gaps. Each saved a file next to the original notes, named `gap_*.md`, in `research_notes/Delt Arena loops and screens/`. Several sources stayed closed, so some gaps are now filled, some are narrower, and some still need a device or a paid account. The live set screen keeps both modes as designed: predictive tap by default, with the optional voice mode.
+
+### Corrections to the plan
+
+| Area | What the pass found | What changes |
+|---|---|---|
+| Press and hold | Flutter's default long press is 500ms | The gesture table now states 400ms as an explicit setting |
+| Haptics | `HapticFeedback` takes no pattern, so Bell's double pulse needs a native call. Detent fits `selectionClick`; Stamp fits `mediumImpact` or `heavyImpact` | Build team writes Bell natively |
+| Reduced motion | `MediaQueryData.disableAnimations` exists and animations honour it | Use it for the instant-change fallback |
+| Native bridge | Flutter now recommends Pigeon over hand-written platform channels | Use Pigeon for the foreground service and Live Update bridge |
+| Edge-to-edge | Android 16 removes the opt-out | Inset handling is mandatory |
+| Health package | Needs `FlutterFragmentActivity`; on iOS a denied read looks like empty data | Add both to the build checklist |
+| Motion tokens | Expressive spatial springs read as stiffness 800, 380 and 200 with damping 0.6, 0.8 and 0.8 (fast, default, slow). Effects springs read 3800, 1600 and 800 at damping 1.0. Standard spatial reads 1400, 700 and 300 at 0.9 | Start the snappy and settle tokens from these. They came through a summarising fetch of the Compose token files, so confirm them against the raw files |
+| Shape | Corner scale is 4, 8, 12, 16, 20, 28, 32 and 48dp, plus full | The 4dp container is confirmed |
+| Type | Display numerals at 64 to 96sp exceed the largest M3 style (57sp), and the Wear OS post cited for Roboto Flex does not name it | Treat the numeral style as a custom component, cite the M3 type page, and consider emphasized styles for the selected set |
+| Rest in the science notes | The ACSM 2009 figures were quoted wrongly | training_science.md should say 3 to 5 minutes for heavy strength sets and 1 to 2 for hypertrophy |
+| Weekly set band | The notes use both 10 to 20 and 12 to 20, and no range belongs to Schoenfeld 2017 | Call the band a practitioner synthesis; 12 to 20 is supported only for young trained men |
+| Frequency | Schoenfeld 2016 favours twice weekly, while Grgic 2019 finds no clear effect when volume is equal | Soften the twice-a-week warning in Sam's example |
+| Protein, failure, detraining | Three claims were overstated | Reworded in this report above |
+| Re-entry percentages | No checked paper supports them | They stay labelled as design judgement |
+| TRIMP and calorie figures | These are not PubMed sources and were not verified | Treat as unverified until checked |
+
+The verification file lists 17 papers with design, sample size, key result and a verdict on each claim, and it was done at abstract level only. Full texts still need reading before the numbers go into app copy.
+
+### What the reviews and threads add
+
+The Play Store samples covered Hevy (4.9 stars, 295K reviews), Strong (4.3, 42.8K), Fitbod (4.5, 32.2K), Alpha Progression (4.8, 21.5K), JEFIT (4.4, 90.2K) and Gravl (4.9, 18.3K). They used the "most relevant" sort only, and the counts are hand tallies. Reddit coverage is thin: nine threads were read in full or in part across r/Hevy, r/strongapp and r/fitbod, and r/weightroom had no app threads in the year-top search.
+
+Logging speed is rarely the subject of a review. In the JEFIT, Alpha and Gravl samples about 5 to 7 percent of reviews praise it. The friction that recurs sits around removing a set, ending a workout and editing mid-session. JEFIT has a November 2026 report that a workout cannot be ended, and Alpha users complain about extra sets. A fast, obvious Undo on the live set screen answers both, and removing a set should be as easy as adding one.
+
+Strong users lose work when the back button minimises an open workout, and edits made during a session do not always reach the template. The predictive-back rule in the platform table covers the first. For the second, the app should ask before writing a session edit back to the program.
+
+Rest timer complaints are mostly about sound. Alerts stop after an update, follow the ringer volume, or disappear when the user leaves the screen, and Strong users report the timer covering the next set's targets. The Bell haptic and the Live Update already help. The plan should add a visible end state, so no single sound channel carries the alert, and the next set's target should stay readable while rest runs.
+
+Fitbod draws the most complaints about planner logic. Gravl users complain about weights they cannot load and a paywall that appears after setup. Hevy Trainer users asked to keep their own program and receive only weight suggestions. These support the Coach screen's one-line reasons, the autonomy setting and equipment-aware rounding. They also support showing any paid gate before Setup and never locking past logs.
+
+No reviewer or thread described one-handed use, and no thread asked for voice logging. The predictive tap mode and the optional voice mode therefore have no competitor evidence for or against them, and the beta has to measure both.
+
+Bluetooth heart rate is new in Hevy, and early threads describe a link that looks connected but saves nothing. Cardio live and the Summary should show whether the session saved.
+
+Tap counts were not obtained. Mobbin redirected to its home page because the browser was not signed in, and no source counted taps on a live screen. JEFIT's claim of one tap per pre-filled set is a vendor statement. The target of one tap per set still has no competitor baseline, and getting one needs a logged session in each app on a test account.
+
+### Protocol specs
+
+The Bluetooth SIG and Concept2 PDFs could not be read directly. The tables in `gap_ftms_pm5_specs.md` come from open-source GATT XML mirrors and the c2bluetooth and ronanb96 libraries, so they must be checked against the official documents before parsers are written. With that caveat, the cardio list now maps to characteristics:
+
+| Machine | Characteristic | Confidence |
+|---|---|---|
+| Treadmill | Treadmill Data, 0x2ACD | Direct |
+| Elliptical | Cross Trainer Data, 0x2ACE | Direct |
+| Bike | Indoor Bike Data, 0x2AD2 | Direct |
+| Rower | Rower Data, 0x2AD1 | Direct, but the source XML is marked not approved |
+| Stair climber | Stair Climber Data, 0x2AD0 | Direct, from a secondary table |
+| Step mill | Step Climber Data, 0x2ACF | Inferred |
+| Incline trainer | Treadmill Data or Cross Trainer Data | Inferred |
+| Air bike, ski erg | No FTMS type found; the SkiErg most likely uses the PM5 interface | Unverified |
+
+Heart rate comes from service 0x180D or from the heart-rate bit in the machine data. A parser should read the Fitness Machine Feature characteristic (0x2ACC) first and check its bits before subscribing. Concept2 byte layouts and update rates were not reached. The Logbook documentation suggests approval is needed for apps that write data, and the plan should confirm that with Concept2.
+
+### Still open
+
+Tap counts per app and the Mobbin flows; Play Store "most helpful" and one- and two-star samples; voice and one-hand evidence; PM5 byte layouts; the FTMS status tables; StairMaster and Peloton evidence; layout at 200 percent text scale; how TalkBack handles custom actions; on-device speech on Android; full-text checks of the PubMed papers; and the TRIMP and MET constants. The open-question table above is otherwise unchanged.
 
 ## Conclusion
 
