@@ -1,0 +1,456 @@
+<title>Delt Arena</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;700;800&family=Hanken+Grotesk:wght@400;500;600;700&display=swap">
+<style>
+/* Layout: a working plan document (single reading column, wide breakouts for tables and the two phones). The app world: a competition lifting platform. Chalk ground, ink, and the IWF bumper-plate colour code as the semantic system lifters already read without thinking. */
+:root{
+  --chalk:#ECEEEF; --paper:#F7F8F8; --ink:#14181B; --ink-2:#4A535B; --rule:#CDD3D7;
+  --tint:#1D56D6;            /* IWF blue 20 kg: the one interactive colour */
+  --red:#CE2A3C;             /* 25 kg red: over range, stop */
+  --yellow:#E8B321;          /* 15 kg yellow: under range, watch */
+  --green:#23875A;           /* 10 kg green: in range, done */
+  --plate-white:#FFFFFF; --chrome:#AEB6BD;
+  --band:#DCE3EA;            /* target band on charts */
+  --on-tint:#FFFFFF;
+  --phone-bg:#F2F3F4; --phone-card:#FFFFFF; --phone-edge:#1A1E21;
+  --f-display:"Big Shoulders Display", "Oswald", "Arial Narrow", sans-serif;
+  --f-body:"Hanken Grotesk", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  color-scheme:light;
+}
+@media (prefers-color-scheme: dark){ :root:not([data-theme="light"]){
+  --chalk:#0D1012; --paper:#14181B; --ink:#E9ECEE; --ink-2:#9AA4AC; --rule:#2A3137;
+  --tint:#5B8BFF; --red:#F0566A; --yellow:#F2C441; --green:#3DBB7E;
+  --plate-white:#E9ECEE; --chrome:#7D8790; --band:#1F2A35; --on-tint:#0D1012;
+  --phone-bg:#0A0C0E; --phone-card:#15191C; --phone-edge:#2B3238;
+  color-scheme:dark;
+}}
+:root[data-theme="dark"]{
+  --chalk:#0D1012; --paper:#14181B; --ink:#E9ECEE; --ink-2:#9AA4AC; --rule:#2A3137;
+  --tint:#5B8BFF; --red:#F0566A; --yellow:#F2C441; --green:#3DBB7E;
+  --plate-white:#E9ECEE; --chrome:#7D8790; --band:#1F2A35; --on-tint:#0D1012;
+  --phone-bg:#0A0C0E; --phone-card:#15191C; --phone-edge:#2B3238;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--chalk);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55;
+  padding-left:max(16px, env(safe-area-inset-left, 0px));padding-right:max(16px, env(safe-area-inset-right, 0px));padding-block:0 64px;
+  -webkit-font-smoothing:antialiased}
+::selection{background:var(--tint);color:var(--on-tint)}
+a{color:var(--tint);text-underline-offset:3px}
+:focus-visible{outline:2px solid var(--tint);outline-offset:3px;border-radius:4px}
+.doc{max-width:1120px;margin:0 auto}
+.col{max-width:68ch}
+h1,h2,h3{font-family:var(--f-display);font-weight:800;letter-spacing:-0.01em;line-height:1.02;text-wrap:balance;margin:0}
+h1{font-size:clamp(3.4rem, 9vw, 6rem);text-transform:uppercase}
+h2{font-size:clamp(2rem,4.6vw,2.9rem);text-transform:uppercase;margin-top:72px;margin-bottom:16px}
+h3{font-size:1.45rem;text-transform:uppercase;margin-top:32px;margin-bottom:8px;letter-spacing:0.01em}
+p{margin:0 0 14px}
+.lede{font-size:1.2rem;line-height:1.5;max-width:60ch;color:var(--ink)}
+.muted{color:var(--ink-2)}
+.num{font-variant-numeric:tabular-nums}
+header.top{padding-block:56px 8px;display:grid;gap:20px}
+.topline{display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;font-size:.9rem;color:var(--ink-2)}
+.plates-row{display:flex;gap:4px;align-items:center}
+.plates-row i{display:block;width:10px;height:28px;border-radius:2px}
+.jump{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:0 18px;border-radius:999px;background:var(--tint);color:var(--on-tint);text-decoration:none;font-weight:600}
+.jump:hover{filter:brightness(1.08)}
+
+/* lists and tables */
+ul.plain{padding-left:1.1em;margin:0 0 14px}
+ul.plain li{margin-bottom:8px}
+.tablewrap{overflow-x:auto;margin:16px 0 8px;border:1px solid var(--rule);border-radius:14px;background:var(--paper)}
+table{border-collapse:collapse;width:100%;min-width:720px;font-size:.95rem}
+th,td{text-align:left;vertical-align:top;padding:12px 14px;border-bottom:1px solid var(--rule)}
+th{font-size:.78rem;letter-spacing:.06em;text-transform:uppercase;color:var(--ink-2);font-weight:600}
+tr:last-child td{border-bottom:0}
+td:first-child{font-weight:600;min-width:170px}
+.pill{display:inline-block;font-size:.78rem;font-weight:700;letter-spacing:.04em;text-transform:uppercase;padding:2px 9px;border-radius:999px;white-space:nowrap}
+.p-easy{background:color-mix(in srgb,var(--green) 18%,transparent);color:var(--green)}
+.p-mid{background:color-mix(in srgb,var(--yellow) 26%,transparent);color:color-mix(in srgb,var(--yellow) 55%,var(--ink))}
+.p-hard{background:color-mix(in srgb,var(--red) 16%,transparent);color:var(--red)}
+
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr));gap:20px;margin-top:16px}
+.block{background:var(--paper);border:1px solid var(--rule);border-radius:14px;padding:20px 22px;min-width:0}
+.block h3{margin-top:0}
+.block p:last-child,.block ul:last-child{margin-bottom:0}
+
+.flow{display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,200px),1fr));gap:0;margin-top:16px;border:1px solid var(--rule);border-radius:14px;overflow:hidden;background:var(--paper)}
+.flow div{padding:18px;border-right:1px solid var(--rule);min-width:0}
+.flow div:last-child{border-right:0}
+.flow b{display:block;font-family:var(--f-display);font-size:1.25rem;text-transform:uppercase;letter-spacing:.01em;margin-bottom:6px}
+.flow span{font-size:.92rem;color:var(--ink-2)}
+
+.swatches{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0 4px}
+.sw{display:grid;grid-template-columns:44px auto;gap:10px;align-items:center;font-size:.9rem}
+.sw i{width:44px;height:44px;border-radius:8px;border:1px solid var(--rule)}
+
+/* ===== phones ===== */
+.stage{display:flex;flex-wrap:wrap;justify-content:center;gap:40px 56px;margin-top:28px}
+.shot{display:grid;gap:16px;justify-items:center;width:min(372px,100%)}
+.shot figcaption{max-width:360px;font-size:.95rem;color:var(--ink-2)}
+.shot figcaption b{color:var(--ink);font-family:var(--f-display);font-size:1.3rem;text-transform:uppercase;display:block;margin-bottom:4px;letter-spacing:.01em}
+.phone{width:min(372px,100%);aspect-ratio:372/806;max-width:100%;border-radius:56px;padding:10px;background:var(--phone-edge);
+  box-shadow:0 30px 60px -24px rgba(10,14,18,.45),0 8px 18px -8px rgba(10,14,18,.3)}
+.screen{position:relative;width:100%;height:100%;border-radius:47px;overflow:hidden;background:var(--phone-bg);color:var(--ink);
+  font-size:14px;line-height:1.35;display:flex;flex-direction:column}
+.status{height:48px;flex:none;display:flex;align-items:center;justify-content:space-between;padding:6px 30px 0;font-weight:600;font-size:14px}
+.status .island{width:108px;height:31px;border-radius:20px;background:#000;position:absolute;left:50%;top:10px;transform:translateX(-50%)}
+.status .sys{display:flex;gap:5px;align-items:center}
+.homebar{position:absolute;bottom:7px;left:50%;transform:translateX(-50%);width:128px;height:5px;border-radius:3px;background:var(--ink);opacity:.85}
+.body{flex:1;overflow:hidden;padding:4px 16px 0;display:flex;flex-direction:column;gap:8px}
+.icon{width:20px;height:20px;stroke:currentColor;fill:none;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:none}
+
+/* screen 1 */
+.s-head{display:flex;justify-content:space-between;align-items:center}
+.s-head .ttl{font-weight:700;font-size:15px}
+.s-head .ttl small{display:block;font-weight:500;font-size:12px;color:var(--ink-2)}
+.clock{font-family:var(--f-display);font-weight:700;font-size:22px;font-variant-numeric:tabular-nums}
+.endbtn{min-height:34px;padding:0 14px;border-radius:999px;border:1px solid var(--rule);background:var(--phone-card);color:var(--ink);font:600 13px var(--f-body)}
+.rest{display:grid;gap:6px;background:var(--phone-card);border-radius:14px;padding:10px 12px}
+.rest .row{display:flex;justify-content:space-between;font-size:12.5px;color:var(--ink-2)}
+.rest .row b{color:var(--ink);font-variant-numeric:tabular-nums}
+.track{height:6px;border-radius:3px;background:var(--band);overflow:hidden}
+.track i{display:block;height:100%;width:56%;background:var(--tint);border-radius:3px;animation:drain 30s linear infinite}
+@keyframes drain{from{width:56%}to{width:0%}}
+.ex{display:flex;justify-content:space-between;align-items:baseline;margin-top:2px}
+.ex h4{margin:0;font-size:19px;font-weight:700;letter-spacing:-.01em}
+.ex span{font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.target{background:var(--phone-card);border-radius:18px;padding:14px 14px 12px;display:grid;gap:10px}
+.target .lab{font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.bign{font-family:var(--f-display);font-weight:800;font-size:64px;line-height:.9;letter-spacing:-.01em;font-variant-numeric:tabular-nums;display:flex;align-items:baseline;gap:8px}
+.bign small{font-size:22px;font-weight:700;color:var(--ink-2)}
+.bign .x{font-size:34px;color:var(--ink-2)}
+.why{font-size:12.5px;color:var(--ink-2)}
+.why b{color:var(--green);font-weight:700}
+.loader{display:flex;align-items:center;gap:10px}
+.loader svg{flex:none}
+.loader .per{font-size:12px;color:var(--ink-2);line-height:1.3}
+.loader .per b{color:var(--ink);font-variant-numeric:tabular-nums}
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.stepper{display:grid;grid-template-columns:40px 1fr 40px;align-items:center;background:var(--phone-card);border-radius:14px;height:48px;padding:0 4px}
+.stepper button{width:40px;height:40px;border-radius:11px;border:0;background:var(--phone-bg);color:var(--ink);font:600 20px var(--f-body);display:grid;place-items:center}
+.stepper span{text-align:center;font-weight:700;font-size:17px;font-variant-numeric:tabular-nums}
+.stepper span small{display:block;font-size:10.5px;font-weight:600;color:var(--ink-2);letter-spacing:.05em;text-transform:uppercase;margin-top:-2px}
+.rir{display:flex;gap:6px;align-items:center;font-size:12px;color:var(--ink-2)}
+.rir button{min-width:36px;height:32px;border-radius:9px;border:1px solid var(--rule);background:var(--phone-card);color:var(--ink);font:600 13px var(--f-body)}
+.rir button[aria-pressed="true"]{background:var(--ink);color:var(--phone-bg);border-color:var(--ink)}
+.log{height:54px;border:0;border-radius:16px;background:var(--tint);color:var(--on-tint);font:700 17px var(--f-body);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;transition:transform .12s ease-out}
+.log:active{transform:scale(.98)}
+.done{display:grid;gap:2px;font-size:13px}
+.done div{display:grid;grid-template-columns:20px 1fr auto;gap:8px;align-items:center;padding:4px 2px;font-variant-numeric:tabular-nums}
+.done div span:last-child{color:var(--ink-2);font-size:12px}
+.done .ok{color:var(--green)}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quick button{min-height:44px;border-radius:12px;border:1px solid var(--rule);background:transparent;color:var(--ink);font:600 12px var(--f-body);display:flex;align-items:center;justify-content:center;gap:5px;padding:0 6px}
+.quick .hurt{color:var(--red);border-color:color-mix(in srgb,var(--red) 40%,var(--rule))}
+.next{background:var(--phone-card);border-radius:14px;padding:10px 12px;display:grid;gap:8px;font-size:13px}
+.next .r{display:flex;align-items:center;gap:10px}
+.next .r .t{flex:1;min-width:0}
+.next .r .t small{display:block;color:var(--ink-2);font-size:11.5px}
+.dot{width:8px;height:8px;border-radius:50%;background:var(--ink-2);flex:none}
+.bt{font-size:11px;font-weight:700;color:var(--tint);border:1px solid color-mix(in srgb,var(--tint) 45%,transparent);border-radius:999px;padding:3px 8px;white-space:nowrap}
+
+/* screen 2 */
+.lt{font-size:30px;font-weight:800;letter-spacing:-.02em;line-height:1.05;margin:2px 0 0}
+.sub{font-size:12.5px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.bal{background:var(--phone-card);border-radius:18px;padding:11px 12px 9px;display:grid;gap:5px}
+.bal .hd{display:flex;justify-content:space-between;align-items:baseline;font-size:11.5px;font-weight:700;letter-spacing:.07em;text-transform:uppercase;color:var(--ink-2)}
+.bal .hd span{letter-spacing:0;text-transform:none;font-weight:500}
+.mrow{display:grid;grid-template-columns:78px 1fr 26px;gap:8px;align-items:center;font-size:12.5px}
+.mrow .bar{position:relative;height:12px;border-radius:3px;background:transparent}
+.mrow .bar .bandz{position:absolute;top:0;bottom:0;background:var(--band);border-radius:3px}
+.mrow .bar .v{position:absolute;left:0;top:3px;height:6px;border-radius:3px;background:var(--ink)}
+.mrow.over .v{background:var(--red)} .mrow.under .v{background:var(--yellow)}
+.mrow b{text-align:right;font-variant-numeric:tabular-nums}
+.mrow.over b{color:var(--red)} .mrow.under b{color:color-mix(in srgb,var(--yellow) 60%,var(--ink))}
+.axis{display:grid;grid-template-columns:78px 1fr 26px;gap:8px;font-size:10px;color:var(--ink-2)}
+.axis div{display:flex;justify-content:space-between;font-variant-numeric:tabular-nums}
+.card{background:var(--phone-card);border-radius:18px;padding:12px 14px;display:grid;gap:7px}
+.card .k{display:flex;align-items:center;gap:7px;font-size:11.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase}
+.card .k i{width:9px;height:9px;border-radius:2px;display:block}
+.card h5{margin:0;font-size:15.5px;font-weight:700;line-height:1.25;letter-spacing:-.005em}
+.card p{margin:0;font-size:13px;color:var(--ink-2);line-height:1.4}
+.card .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:2px}
+.card .acts button{min-height:36px;padding:0 13px;border-radius:10px;font:600 13px var(--f-body);border:1px solid var(--rule);background:transparent;color:var(--ink)}
+.card .acts .pri{background:var(--tint);color:var(--on-tint);border-color:var(--tint)}
+.drills{margin:0;padding-left:16px;font-size:12.5px;color:var(--ink)}
+.drills li{margin-bottom:1px}
+.safety{font-size:11px;color:var(--ink-2);border-top:1px solid var(--rule);padding-top:6px}
+.ask{position:absolute;left:12px;right:12px;bottom:74px;height:48px;border-radius:16px;background:color-mix(in srgb,var(--phone-card) 82%,transparent);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);
+  border:1px solid var(--rule);display:flex;align-items:center;gap:10px;padding:0 8px 0 14px;font-size:14px;color:var(--ink-2);box-shadow:0 8px 24px -12px rgba(0,0,0,.35)}
+.ask span{flex:1}
+.ask .mic{flex:none}
+.ask .mic{width:36px;height:36px;border-radius:10px;background:var(--tint);color:var(--on-tint);display:grid;place-items:center}
+.tabs{position:absolute;left:0;right:0;bottom:0;height:70px;padding:8px 18px 20px;display:grid;grid-template-columns:repeat(4,1fr);
+  background:color-mix(in srgb,var(--phone-bg) 86%,transparent);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-top:1px solid var(--rule)}
+.tabs div{display:grid;justify-items:center;gap:2px;font-size:10.5px;font-weight:600;color:var(--ink-2)}
+.tabs .on{color:var(--tint)}
+.fade{position:absolute;left:0;right:0;bottom:118px;height:40px;background:linear-gradient(to bottom,transparent,var(--phone-bg));pointer-events:none}
+
+.example{font-size:.85rem;color:var(--ink-2);text-align:center;margin-top:18px}
+.foot{margin-top:72px;padding-top:20px;border-top:1px solid var(--rule);font-size:.9rem;color:var(--ink-2)}
+@media (prefers-reduced-motion: reduce){ .track i{animation:none} .log{transition:none} }
+</style>
+
+<div class="doc">
+
+<header class="top">
+  <div class="topline">
+    <span class="plates-row" aria-hidden="true"><i style="background:var(--red)"></i><i style="background:var(--tint)"></i><i style="background:var(--yellow)"></i><i style="background:var(--green)"></i><i style="background:var(--plate-white);border:1px solid var(--rule)"></i></span>
+    <span>Concept plan and first two screens</span><span>November 2026</span>
+  </div>
+  <h1>Delt Arena</h1>
+  <p class="lede">One log for barbells, machines, roads and pools, and a coach that reads all of it. You tap once to record a set or start a run. The coach works out the next session, watches muscle balance and training load, and explains every number it gives you.</p>
+  <p><a class="jump" href="#screens">See the two screens</a></p>
+</header>
+
+<section class="col" id="research">
+  <h2>What the field does today</h2>
+  <p>Gym logging, GPS cardio, recovery and AI coaching live in separate apps today, and each one is weak where the others are strong.</p>
+  <h3>Strength loggers: Hevy, Strong, Fitbod, Alpha Progression</h3>
+  <p>Logging works well. A set usually takes three to five touches: pick the exercise, adjust weight and reps, tick it, and the rest timer starts. Strong's watch app gets it down to one tap on a set ring. Complaints are about the basics around the log: rest timers that can't be muted or don't reach the lock screen (<a href="https://justuseapp.com/en/app/1462277793/alpha-progression-gym-logger/reviews">Alpha Progression reviews</a>), plate calculators behind paywalls, and little help deciding what to lift next (<a href="https://dr-muscle.com/hevy-workout-app-review/">Hevy review</a>). Fitbod does program for you, but users describe repeated exercises and suggested weights that feel "randomized or unsound" (<a href="https://www.indiehackers.com/post/fitbod-app-review-2026-honest-take-after-real-testing-45d5f07a1b">review</a>, <a href="https://www.trustpilot.com/review/fitbod.me">Trustpilot</a>).</p>
+  <h3>Cardio: Strava, Runna, Apple Workout</h3>
+  <p>Outdoor GPS is solved. Gym machines aren't. Apple Watch treadmill distance regularly comes out well short of the console's, and Workout won't let you type in the machine's number (<a href="https://discussions.apple.com/thread/254912691">Apple forums</a>). Apple's GymKit pairs with machines, but only some machines in some gyms (<a href="https://9to5mac.com/2026/08/12/bowflex-t6-review-apple-gymkit-comes-home-at-a-normal-treadmill-price/">9to5Mac</a>). The Bluetooth Fitness Machine standard exists and a few apps read it (<a href="https://bluetooth.com/de/specifications/specs/fitness-machine-service-1-0">Bluetooth SIG</a>). We found no app that reads the console from a photo. Runna is the most motivating plan app, and also the one users blame for plans that ramp too fast (<a href="https://www.techradar.com/health-fitness/are-ai-training-apps-like-runna-putting-you-at-risk-of-injury-i-asked-a-real-life-running-coach">TechRadar</a>).</p>
+  <h3>Recovery and AI coaches: Whoop, Strava Athlete Intelligence</h3>
+  <p>Whoop's wrist sensor under-reads heart rate during lifting, so an hour of heavy training can score like a short walk (<a href="https://community.whoop.com/t/inaccurate-heart-rate-during-strength-training/1171">Whoop community</a>). Strava's AI summaries get called generic and patronising because they restate the numbers and ignore longer trends (<a href="https://www.trainerroad.com/forum/t/strava-new-ai-feature/97192">TrainerRoad forum</a>, <a href="https://cyclingweekly.com/news/strava-says-its-new-ai-feature-is-not-a-novelty-but-i-think-its-pointless">Cycling Weekly</a>). Whoop Coach gets credit when it interprets the user's own data and loses it when it gives generic advice (<a href="https://www.t3.com/features/i-tried-ai-based-whoop-coach">T3</a>). Apple's 2026 Design Award finalists include The Outsiders: Athlete Tracker, recognised for a readiness score built from load, sleep and resting heart rate (<a href="https://developer.apple.com/design/awards/">Apple</a>). That's the bar for this category.</p>
+  <h3>What the evidence supports for the coach's rules</h3>
+  <ul class="plain">
+    <li>Weekly volume: more hard sets grow more muscle up to a point. A 2022 review puts 12 to 20 weekly sets per muscle as a sound standard for trained lifters (<a href="https://pubmed.ncbi.nlm.nih.gov/35291645/">PubMed</a>; earlier dose-response work: <a href="https://pubmed.ncbi.nlm.nih.gov/27433992/">Schoenfeld 2017</a>). Ranges vary by person, so they start as defaults and get calibrated per lifter.</li>
+    <li>Frequency: train each muscle at least twice a week (<a href="https://pubmed.ncbi.nlm.nih.gov/27102172/">2016 meta-analysis</a>).</li>
+    <li>Progression: loading by reps in reserve does at least as well as fixed percentages (<a href="https://www.frontiersin.org/journals/physiology/articles/10.3389/fphys.2018.00247/pdf">Helms 2018</a>). Double progression is coaching practice rather than a tested protocol.</li>
+    <li>Running load: the acute:chronic ratio (a 0.8 to 1.3 "safe zone") is widely used and also disputed (<a href="https://bjsm.bmj.com/content/50/5/273.abstract">Gabbett 2016</a>, against: <a href="https://www.ncbi.nlm.nih.gov/pmc/articles/PMC7485291/">Sedeaud 2020</a>). Delt Arena treats it as a heads-up, never a block.</li>
+  </ul>
+  <p class="muted">Limits: Reddit and some journal sites were blocked from this session, so app complaints come from reviews, forums and blogs (some run by competitors). Read them as signals, not measurements.</p>
+</section>
+
+<section id="upgrades">
+  <h2>Upgrades you can feel</h2>
+  <p class="col">Each of these fixes a specific friction in today's apps. None of them needs research-grade technology. Most are rules and good defaults.</p>
+  <div class="grid2">
+    <div class="block"><h3>The set is already filled in</h3><p>Every set opens with today's prescription (weight, reps, target reps in reserve) worked out from last session. If you hit it, one tap logs it. You only touch the steppers when the set went differently. A set that matches the plan costs one tap instead of three or four.</p></div>
+    <div class="block"><h3>Plates, worked out</h3><p>The prescribed weight is drawn as plates per side in the competition colour code, using the plates your gym actually has. Nobody does bar maths between sets.</p></div>
+    <div class="block"><h3>Machines report themselves</h3><p>Many recent treadmills, rowers, bikes and stair climbers broadcast speed, distance, floors and time over the Bluetooth Fitness Machine standard (FTMS). Delt Arena pairs with them when you start the block. For older machines, you photograph the console at the end and the app reads the numbers off it.</p></div>
+    <div class="block"><h3>Outdoor cardio starts itself</h3><p>Run, ride and walk start with one tap and pause automatically. A watch handles pool swims (lengths, stroke and pace come from its motion sensors). A phone can't do that, so the app is plain about it.</p></div>
+    <div class="block"><h3>One weekly ledger for every muscle</h3><p>Each exercise maps to the muscles it trains, with partial credit for helpers (a bench press counts fully for chest and half for triceps). The week adds up into hard sets per muscle, drawn against an evidence-based target range. Too much quad and too little hamstring shows up as a picture, then as a suggested fix.</p></div>
+    <div class="block"><h3>A coach that shows its working</h3><p>A deterministic engine calculates every number: progression, volume, running load. The language model explains those numbers, answers questions and drafts drills, and every card has a "Show the math" view. Users trust a suggestion more when they can check it.</p></div>
+    <div class="block"><h3>Something hurts, one tap</h3><p>"Something hurts" sits on every set. You pick the spot, the movement and how bad it is. The coach swaps or modifies the exercise right away, suggests drills with a safety note, and keeps track if the same flag comes back.</p></div>
+    <div class="block"><h3>Programs get a sanity check</h3><p>When you build your own program, the app checks weekly sets per muscle, sets per muscle per session, and how often you train each muscle. It warns, with the reason, when something goes well over or under range. It never blocks you.</p></div>
+  </div>
+</section>
+
+<section id="system">
+  <h2>How the system fits together</h2>
+  <div class="flow">
+    <div><b>1. Set up</b><span>Goal (fat loss, bulk, keep muscle, hypertrophy, strength, endurance), height, weight, training age, days per week, session length, equipment, injuries.</span></div>
+    <div><b>2. Program</b><span>A template picked by goal and days per week, then adjusted for equipment and injuries. The model can't make up a split; it only fills in a structure that's known to work.</span></div>
+    <div><b>3. Train</b><span>Prescribed sets, one-tap logging, machine pairing, GPS. Pain flags and swaps happen inside the set.</span></div>
+    <div><b>4. Read</b><span>Every session updates estimated 1RMs, hard sets per muscle, running load and recovery inputs (sleep and resting heart rate, if a wearable is connected).</span></div>
+    <div><b>5. Adjust</b><span>Next session's targets, swaps for imbalances, deload weeks. Small changes apply automatically. Bigger ones wait for one tap.</span></div>
+  </div>
+
+  <div class="grid2">
+    <div class="block">
+      <h3>The data model</h3>
+      <ul class="plain">
+        <li>Session, then blocks. A block is strength (exercise, sets) or cardio (modality, source, samples).</li>
+        <li>Set: weight, reps, reps in reserve, tempo (optional), side (for single-arm and single-leg work), flags.</li>
+        <li>Cardio samples: time series of pace, speed, incline, floors or steps, heart rate and GPS, depending on the source.</li>
+        <li>Exercise library: muscle weights per exercise, equipment, movement pattern, joint stress profile (used for pain swaps).</li>
+        <li>All of it maps to HealthKit and Health Connect, so nothing is trapped.</li>
+      </ul>
+    </div>
+    <div class="block">
+      <h3>The coach engine</h3>
+      <ul class="plain">
+        <li>Progression: double progression with a reps-in-reserve check. Hit the top of the rep range at the target effort and the weight goes up one plate step. Miss it twice and it holds or drops.</li>
+        <li>Volume: hard sets per muscle per week against a target range for your goal and training age.</li>
+        <li>Running: this week's load against your four-week average, plus a cap on weekly distance jumps. Past about 1.3 you get a heads-up, never a block, because the evidence for a hard line is mixed.</li>
+        <li>One fatigue picture: lifting volume and cardio load sit on the same weekly view, so a heavy leg week and a long run aren't judged in isolation.</li>
+        <li>Language model: turns findings into short cards, answers chat in context, drafts drills from a reviewed library. Medical language always carries the safety note.</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section id="feasibility">
+  <h2>What's easy, what's hard</h2>
+  <p class="col">Sorted by how much engineering risk each piece carries, so the first build can ship the easy wins and hold back the hard parts.</p>
+  <div class="tablewrap">
+    <table>
+      <thead><tr><th>Feature</th><th>Difficulty</th><th>How</th><th>Watch out for</th></tr></thead>
+      <tbody>
+        <tr><td>One-tap prescribed sets</td><td><span class="pill p-easy">Easy</span></td><td>Rules on top of the previous session</td><td>A first-time exercise needs a short calibration set</td></tr>
+        <tr><td>Plate maths and loader</td><td><span class="pill p-easy">Easy</span></td><td>Greedy fit against the gym's plate inventory</td><td>kg and lb, 15 kg bars, fixed-weight machines</td></tr>
+        <tr><td>Sets per muscle and balance warnings</td><td><span class="pill p-easy">Easy</span></td><td>Exercise-to-muscle weight table, weekly sums</td><td>The table is the product, so it needs expert review</td></tr>
+        <tr><td>Custom program sanity check</td><td><span class="pill p-easy">Easy</span></td><td>Same ranges, run on the plan before it's used</td><td>Warn with reasons, never block</td></tr>
+        <tr><td>GPS run, ride and walk</td><td><span class="pill p-mid">Medium</span></td><td>CoreLocation and HealthKit workout sessions; Android fused location and Health Connect</td><td>Battery, background limits, auto-pause tuning</td></tr>
+        <tr><td>Machine pairing (FTMS)</td><td><span class="pill p-mid">Medium</span></td><td>Bluetooth LE Fitness Machine Service</td><td>Coverage varies by gym and brand, so there has to be a fallback</td></tr>
+        <tr><td>Console photo reading</td><td><span class="pill p-mid">Medium</span></td><td>On-device text recognition plus field matching</td><td>Glare and odd layouts; the user confirms before saving</td></tr>
+        <tr><td>Onboarding program</td><td><span class="pill p-mid">Medium</span></td><td>Templates by goal and days, then constrained adjustments</td><td>Don't let the model write a program from nothing</td></tr>
+        <tr><td>Pain flags and drills</td><td><span class="pill p-mid">Medium</span></td><td>Reviewed drill library, joint-stress swap rules, model wording</td><td>Safety copy, escalation to a professional, no diagnosis</td></tr>
+        <tr><td>Swim tracking</td><td><span class="pill p-hard">Hard</span></td><td>Watch only (lengths and strokes from motion sensors)</td><td>A phone can't do it; say so plainly</td></tr>
+        <tr><td>Automatic rep counting</td><td><span class="pill p-hard">Hard</span></td><td>Watch accelerometer models</td><td>Misses and false counts cost trust. Leave it out of version one.</td></tr>
+        <tr><td>Form checking by camera</td><td><span class="pill p-hard">Hard</span></td><td>Pose estimation</td><td>Phone placement in a busy gym, liability. Later, if ever.</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="direction">
+  <h2>The look: a competition platform</h2>
+  <div class="col">
+    <p>Most fitness apps reach for black screens with neon green, or soft wellness pastels. Delt Arena takes its look from the lifting platform: chalk-pale ground, dark ink, and the colour code of competition bumper plates. Lifters know that code without thinking (red 25, blue 20, yellow 15, green 10, white 5), so the colours carry meaning without a legend.</p>
+    <p>Blue is the only colour you can tap. Red means over range or stop. Yellow means under range or watch. Green means done or in range. Big numbers are set in a condensed stadium face, so a weight reads from a metre away with the phone on the bench. The rest of the interface stays native: SF Pro for text, system sheets and tab bar, glass only on the bars that float over content (the way Apple's Liquid Glass guidance asks). Dark mode is the same platform under arena lights. Try both with your system setting.</p>
+  </div>
+  <div class="swatches" aria-label="Palette">
+    <div class="sw"><i style="background:var(--chalk)"></i><span>Chalk ground</span></div>
+    <div class="sw"><i style="background:var(--ink)"></i><span>Ink</span></div>
+    <div class="sw"><i style="background:var(--tint)"></i><span>Blue 20: tap</span></div>
+    <div class="sw"><i style="background:var(--red)"></i><span>Red 25: over, stop</span></div>
+    <div class="sw"><i style="background:var(--yellow)"></i><span>Yellow 15: under, watch</span></div>
+    <div class="sw"><i style="background:var(--green)"></i><span>Green 10: done, in range</span></div>
+  </div>
+</section>
+
+<section id="screens">
+  <h2>The first two screens</h2>
+  <p class="col">The two screens that carry the whole bet. Screen one is the moment you're holding the phone between sets. Screen two is the coach working without being asked.</p>
+
+  <div class="stage">
+    <!-- ============ SCREEN 1: LIVE SET ============ -->
+    <figure class="shot" style="margin:0">
+      <div class="phone" role="img" aria-label="Live session screen: bench press set 3 of 4, prescribed 82.5 kilograms for 6 reps, with plate loader, steppers and a one-tap log button">
+        <div class="screen" aria-hidden="true">
+          <div class="status"><span class="num">9:41</span><span class="island"></span>
+            <span class="sys"><svg class="icon" style="width:17px;height:12px" viewBox="0 0 17 12"><path d="M1 11h2V8H1zM5 11h2V6H5zM9 11h2V3H9zM13 11h2V1h-2z" fill="currentColor" stroke="none"/></svg><svg style="width:26px;height:13px" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="15" height="9" rx="2" fill="currentColor"/><rect x="23.5" y="4.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+          <div class="body">
+            <div class="s-head">
+              <div class="ttl">Push A<small>Week 3 of 6 · Hypertrophy</small></div>
+              <div style="display:flex;gap:10px;align-items:center"><span class="clock">34:12</span><button class="endbtn">End</button></div>
+            </div>
+
+            <div class="rest">
+              <div class="row"><span>Resting after set 2</span><b>1:06 left</b></div>
+              <div class="track"><i></i></div>
+            </div>
+
+            <div class="ex"><h4>Bench press</h4><span>Set 3 of 4</span></div>
+
+            <div class="target">
+              <div class="lab">Today's target</div>
+              <div class="bign">82.5<small>kg</small><span class="x">×</span>6</div>
+              <div class="why">Last week 80 × 6 with 2 reps left. <b>+2.5 kg</b>, same reps.</div>
+              <div class="loader">
+                <svg width="150" height="58" viewBox="0 0 150 58" aria-hidden="true">
+                  <rect x="0" y="26" width="40" height="6" rx="2" fill="var(--chrome)"/>
+                  <rect x="38" y="18" width="7" height="22" rx="1.5" fill="var(--chrome)"/>
+                  <rect x="45" y="27" width="100" height="4" rx="2" fill="var(--chrome)"/>
+                  <rect x="47" y="2" width="15" height="54" rx="2.5" fill="var(--red)"/>
+                  <rect x="63" y="12" width="7" height="34" rx="2" fill="var(--plate-white)" stroke="var(--rule)"/>
+                  <rect x="71" y="19" width="5" height="20" rx="1.5" fill="var(--chrome)"/>
+                  <rect x="78" y="22" width="6" height="14" rx="1.5" fill="var(--ink-2)"/>
+                </svg>
+                <div class="per">Per side<br><b>25 + 5 + 1.25</b><br>on a 20 kg bar</div>
+              </div>
+            </div>
+
+            <div class="steps">
+              <div class="stepper"><button>−</button><span>82.5<small>kg</small></span><button>+</button></div>
+              <div class="stepper"><button>−</button><span>6<small>reps</small></span><button>+</button></div>
+            </div>
+            <div class="rir"><span>Reps left</span><button>0</button><button>1</button><button aria-pressed="true">2</button><button>3</button><button>4+</button></div>
+
+            <button class="log"><svg class="icon" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>Log 82.5 × 6</button>
+
+            <div class="done">
+              <div><svg class="icon ok" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Set 1 · 80 × 8</span><span>3 left</span></div>
+              <div><svg class="icon ok" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg><span>Set 2 · 82.5 × 6</span><span>2 left</span></div>
+            </div>
+
+            <div class="quick">
+              <button class="hurt"><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M12 3v10M12 17.5v.5"/><circle cx="12" cy="12" r="10" opacity=".35"/></svg>Hurts</button>
+              <button><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M7 7h11l-3-3M17 17H6l3 3"/></svg>Swap</button>
+              <button><svg class="icon" viewBox="0 0 24 24" style="width:16px;height:16px"><path d="M5 19h4L19 9l-4-4L5 15z"/></svg>Note</button>
+            </div>
+
+            <div class="next">
+              <div class="r"><span class="dot"></span><span class="t">Cable fly<small>3 × 12–15 · 2 reps left</small></span></div>
+              <div class="r"><span class="dot"></span><span class="t">StairMaster<small>12 min · 70 steps/min</small></span><span class="bt">Pairs by Bluetooth</span></div>
+            </div>
+          </div>
+          <span class="homebar"></span>
+        </div>
+      </div>
+      <figcaption><b>1 · The set</b>Today's target is already worked out and drawn as plates. A set that goes to plan is one tap. "Hurts" and "Swap" are always one reach away, and the next machine pairs itself.</figcaption>
+    </figure>
+
+    <!-- ============ SCREEN 2: COACH WEEK ============ -->
+    <figure class="shot" style="margin:0">
+      <div class="phone" role="img" aria-label="Coach screen: weekly hard sets per muscle against target ranges, with three coach cards about hamstring imbalance, a left shoulder flag, and running load">
+        <div class="screen" aria-hidden="true">
+          <div class="status"><span class="num">9:41</span><span class="island"></span>
+            <span class="sys"><svg style="width:17px;height:12px" viewBox="0 0 17 12"><path d="M1 11h2V8H1zM5 11h2V6H5zM9 11h2V3H9zM13 11h2V1h-2z" fill="currentColor"/></svg><svg style="width:26px;height:13px" viewBox="0 0 26 13"><rect x=".5" y=".5" width="22" height="12" rx="3.5" fill="none" stroke="currentColor" opacity=".5"/><rect x="2" y="2" width="15" height="9" rx="2" fill="currentColor"/><rect x="23.5" y="4.5" width="1.6" height="4" rx=".8" fill="currentColor" opacity=".5"/></svg></span></div>
+          <div class="body">
+            <div>
+              <div class="lt">This week</div>
+              <div class="sub">18–24 Nov · 4 sessions · 71 hard sets · 21.4 km run</div>
+            </div>
+
+            <div class="bal">
+              <div class="hd">Hard sets per muscle <span>target range shaded</span></div>
+              <!-- scale: 0..24 sets across the bar; band 10..20 = 41.7%..83.3% -->
+              <div class="mrow"><span>Chest</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:58.3%"></i></div><b>14</b></div>
+              <div class="mrow"><span>Back</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:66.7%"></i></div><b>16</b></div>
+              <div class="mrow"><span>Side delts</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:45.8%"></i></div><b>11</b></div>
+              <div class="mrow over"><span>Quads</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:91.7%"></i></div><b>22</b></div>
+              <div class="mrow under"><span>Hamstrings</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:25%"></i></div><b>6</b></div>
+              <div class="mrow"><span>Glutes</span><div class="bar"><i class="bandz" style="left:41.7%;width:41.6%"></i><i class="v" style="width:41.7%"></i></div><b>10</b></div>
+              <div class="axis"><span></span><div><span>0</span><span>10</span><span>20</span></div><span></span></div>
+            </div>
+
+            <div class="card">
+              <div class="k" style="color:var(--red)"><i style="background:var(--red)"></i>Imbalance</div>
+              <h5>Quads 22 sets, hamstrings 6</h5>
+              <p>Swap Thursday's leg extensions for Romanian deadlifts, 3 × 8, plus 5 minutes of hamstring mobility.</p>
+              <div class="acts"><button class="pri">Apply to Thursday</button><button>Show the math</button></div>
+            </div>
+
+            <div class="card">
+              <div class="k" style="color:color-mix(in srgb,var(--yellow) 60%,var(--ink))"><i style="background:var(--yellow)"></i>Left shoulder · flagged twice</div>
+              <h5>Incline press hurt at the bottom</h5>
+              <ol class="drills"><li>Band external rotation, 2 × 15</li><li>Wall slides, 2 × 10</li><li>Neutral-grip dumbbell press instead</li></ol>
+              <div class="safety">General guidance, not medical advice. Sharp pain, numbness, or pain lasting over a week: see a physio or doctor.</div>
+              <div class="acts"><button class="pri">Add to warm-up</button><button>Ask a follow-up</button></div>
+            </div>
+          </div>
+          <div class="fade"></div>
+          <div class="ask"><svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><path d="M4 5h16v11H9l-5 4z"/></svg><span>Ask about your training</span><span class="mic"><svg class="icon" viewBox="0 0 24 24" style="width:18px;height:18px"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg></span></div>
+          <nav class="tabs">
+            <div><svg class="icon" viewBox="0 0 24 24"><path d="M4 11l8-7 8 7v9H4z"/></svg>Today</div>
+            <div><svg class="icon" viewBox="0 0 24 24"><path d="M3 12h3M18 12h3M6 8v8M18 8v8M9 6v12M15 6v12M9 12h6"/></svg>Train</div>
+            <div class="on"><svg class="icon" viewBox="0 0 24 24"><path d="M4 19V9M10 19V5M16 19v-7M22 19H2"/></svg>Coach</div>
+            <div><svg class="icon" viewBox="0 0 24 24"><rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/></svg>History</div>
+          </nav>
+          <span class="homebar"></span>
+        </div>
+      </div>
+      <figcaption><b>2 · The coach</b>A ledger, not a chat. The week's hard sets per muscle sit against their target range, and each finding comes with a fix you can apply in one tap. The running-load card sits below the fold. Chat is the bar at the bottom.</figcaption>
+    </figure>
+  </div>
+  <p class="example">Every number on both screens is example data.</p>
+</section>
+
+<section class="col" id="next">
+  <h2>What I'd decide next</h2>
+  <ul class="plain">
+    <li>Does this direction match what you had in mind? The platform look, one-tap prescribed sets, and a coach that's a ledger first and a chat second.</li>
+    <li>Platform order: iOS first (HealthKit, Live Activities on the lock screen during rest, Apple Watch for swims), Android second?</li>
+    <li>The exercise-to-muscle table and the drill library need a qualified coach and a physio to review them before launch. They're what makes the coach credible.</li>
+    <li>Next screens to design: onboarding (goal to program in under two minutes), the outdoor run with its live map, and the program builder with its warnings.</li>
+  </ul>
+</section>
+
+<p class="foot">Delt Arena concept, by Claude for review. Research notes cite their sources inline. Gallery sites (Mobbin, Dribbble, Awwwards and others) weren't reachable from this session, so the visual direction doesn't draw on them.</p>
+</div>
