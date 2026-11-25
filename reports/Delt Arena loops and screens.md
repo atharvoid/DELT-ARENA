@@ -72,7 +72,7 @@ Motion follows Expressive's spring physics in spirit, but Flutter does not ship 
 
 ### Haptics
 
-Three haptic words exist and nothing else vibrates. Detent is a light tick for every increment on a ruler input (each 2.5kg or 1 rep), so weight can be set by feel. Stamp is a firm single pulse when a set, session or change is recorded. Bell is a double pulse when rest ends, because the phone is often in a pocket or on the floor. Safety cards do not vibrate; they rely on content. Android's haptics APIs could not be fetched during research, so the exact constants are left to the build team.
+Three haptic words exist and nothing else vibrates. Detent is a light tick for every increment on a ruler input (each 2.5kg or 1 rep), so weight can be set by feel. Stamp is a firm single pulse when a set, session or change is recorded, which also confirms a whole-screen tap without looking. Bell is a double pulse when rest ends, because the phone is often in a pocket or on the floor. Safety cards do not vibrate; they rely on content. Android's haptics APIs could not be fetched during research, so the exact constants are left to the build team.
 
 ### Signature components
 
@@ -149,7 +149,53 @@ The bottom bar has four destinations: Today, Coach, Stats and Plan. Session and 
 
 Android's accessibility guidance underpins the notes column: label every interactive element, merge grouped content into one announcement, give pane titles, hide decorative elements, expose swipe and drag gestures as custom actions for TalkBack, Voice Access and Switch Access, and use shapes, text or haptics in addition to colour ([Android Developers](https://developer.android.com/guide/topics/ui/accessibility/principles)). In Flutter these map to Semantics, MergeSemantics, ExcludeSemantics and CustomSemanticsAction, which the research notes name from general Flutter knowledge rather than a fetched page.
 
-@@SESSION@@
+### The live set surface: tap anywhere to log the predicted set
+
+The Session screen carries most of the app's daily use and is built around one-handed tapping. There is no voice input anywhere in the app, because talking out loud in a gym is awkward for most people and noisy gyms make it unreliable. During a set the whole screen is a single touch surface, so the user never hunts for a small button with chalky or shaking hands.
+
+The surface shows one thing: the app's prediction for the set the user is about to do, in Display numerals large enough to read from a bench. Weight sits on top ("82.5 kg"), reps below it at the same size ("6"), and a smaller line underneath gives effort ("2 in reserve") and the set index ("Set 3 of 4"). A thin top bar, 56dp tall, holds the exercise name and a menu; it is the only part of the screen that does not log a set, and tapping the exercise name opens the Exercise sheet with its demonstration. Logged sets appear as a slim strip of stamps under the top bar ("80 × 8 · 82.5 × 6"), so the user can see what they have done without leaving the surface. The system gesture areas at the left, right and bottom edges are excluded from the surface, as Android's edge-to-edge guidance asks ([System bars](https://developer.android.com/design/ui/mobile/guides/foundations/system-bars)).
+
+| Gesture | Result | Feedback |
+|---|---|---|
+| Tap anywhere on the surface | Logs exactly the shown weight, reps and effort; rest starts at once | Stamp haptic; numbers morph into a square stamp that slides into the strip |
+| Press and hold anywhere (about 400ms) | Raises the Thumb keypad from the bottom edge, prefilled with the prediction | Detent haptic as the sheet starts to rise |
+| Tap one half (split mode) | Logs that half's outcome | Stamp haptic; the other half fades |
+| Tap the Undo chip that appears for 8 seconds after a log, or choose Undo last set in the menu | Removes the last set and restores the surface | Stamp haptic reversed (short single pulse) |
+| A second tap within 3 seconds of a log | Ignored; shows "Already logged" with Undo | None |
+
+The Thumb keypad covers the bottom 55% of the screen so every key is in thumb reach. Its top row shows the reps already filled with the guess, so a set of 5 instead of 6 is one key press on "5" and one on Log. The weight row has minus and plus keys that move by the user's smallest available increment (set from their plates or dumbbell rack), plus a plate pad that shows the per-side plates for the new weight. Effort chips (0, 1, 2, 3, 4+ reps in reserve) sit above Log. The bottom row carries the session's secondary actions: Swap, Pain, Note and Skip exercise. Log is the only Signal key on the keypad, at the bottom right (bottom left for left-handed users, set in Settings).
+
+#### Split mode when the app is unsure
+
+When the app's prediction is uncertain, the surface splits into two halves showing the two likeliest outcomes, for example "6 reps" and "5 reps" at the same weight. The halves are vertical (left and right) so that both run down to the bottom of the screen and stay reachable one-handed; the more likely outcome sits on the user's dominant-hand side. One tap on either half logs it. If neither is right, press and hold still raises the keypad. Split mode never shows more than two options, and the halves carry their probability as a word only ("likely" and "possible") because a percentage adds reading without changing the choice.
+
+#### How the prediction is made
+
+The prediction is computed by the rule engine before the set begins, from four inputs: the program's prescription for this set (load, rep range, target reps in reserve), what the user did on the same exercise last time, what they have done earlier today, and how long they actually rested. The steps below are design judgement; the research found no published method for within-session rep prediction.
+
+Weight comes from the program after auto-progression, rounded to the user's equipment, and stays the same across working sets unless the program prescribes back-off sets. For the first working set, the predicted reps are last session's first-set reps at this load. If the load went up since last time, the engine inverts the Epley formula, reps = 30 × (e1RM ÷ weight − 1), subtracts the target reps in reserve, and caps the result at the top of the rep range ([Wikipedia: 1RM](https://www.Wikipedia.org/wiki/1RM)). Epley is reliable only for sets of roughly 2 to 10 reps ([Topend Sports](https://www.topendsports.com/testing/calculators/1repmax.htm)), so for sets outside that range the engine falls back to last session's reps.
+
+For later sets, predicted reps = previous set's reps − d, where d is this user's typical drop-off for this exercise at this effort. The engine learns d from history as the median rep drop between consecutive working sets at constant load, and starts from a prior of 1 rep per set for compound lifts and 0.5 for isolation lifts until it has five sessions of data. If the user rested noticeably less than the program's rest (under 70% of it), d grows by half a rep. If today's earlier sets beat the prediction, the next prediction shifts up by the same amount, which captures good days.
+
+Confidence comes from the spread of the user's past errors on this exercise. The engine turns the prediction into a probability for each whole rep count. If the most likely count has at least 60% probability, the surface shows a single prediction. If it does not, but the two likeliest counts together reach at least 75%, the surface splits. Below that, it shows the single most likely count and opens the keypad faster (on a shorter hold) for that set. A new exercise with no history shows the program target as a single prediction, labelled "target" instead of "predicted".
+
+Effort (reps in reserve) is predicted as the program's target. The app does not ask for it on every set, because asking doubles the taps. After the last set of each exercise, the rest screen shows effort chips in its lower half ("How many more could you have done? 0 · 1 · 2 · 3 · 4+"); the user can tap one while resting or ignore it, in which case the target is assumed. These answers drive load progression, which is reasonable because self-reported reps in reserve is usually within about one rep of the truth ([Stronger by Science](https://www.strongerbyscience.com/reps-in-reserve)).
+
+The prediction model improves the more the user logs. After every set the engine stores the error between predicted and actual reps, which narrows the spread for that exercise and makes split mode rarer over time.
+
+#### Rest, preloading and the Live Update
+
+Rest starts automatically on every log, with its length set by the program for that exercise. The surface becomes a draining Scale with the time left in large numerals, +15s and Skip as two clear keys, and, in the lower half, the next set already loaded: the same exercise's next set, the superset partner, or the next exercise with its setup ("Incline dumbbell press · 30 kg · bench at 30°"). When rest ends, a Bell haptic and optional tone play, and the surface switches to the prediction for the preloaded set. If the user starts early, a tap anywhere during rest logs the next set and restarts the clock, so the user is never blocked by the timer.
+
+The same rest timer runs in an Android Live Update: a promoted ongoing notification with a Chronometer countdown in the status-bar chip, ProgressStyle segments for sets done, and +15s and Skip actions ([Live Updates](https://developer.android.com/develop/ui/views/notifications/live-update)). Hevy offers the same +15 seconds and skip controls in its Android widget ([Hevy help](https://help.hevyapp.com/hc/en-us/articles/35649846517399)). The countdown is owned by a foreground service so it fires on time with the screen off.
+
+Supersets work without extra taps. Logging A1 loads A2 immediately with no rest; logging A2 starts the rest and preloads A1's next set. The top bar shows "A1 of 2" so the user knows where they are. Drop sets log as child rows of their parent set and do not start rest. Warm-up sets for the first compound lift are generated with plate breakdowns and shown on the surface as lighter numerals with "Warm-up 2 of 3"; tapping logs them like any other set. Strong charges for its warm-up and plate calculators ([AI Tools Bakery](https://aitoolsbakery.com/blog/strong-app-review/)), so including both free is a cheap advantage.
+
+#### Accessibility of a whole-screen gesture surface
+
+A screen reader intercepts taps, so the surface has to be built as an explicit accessibility object. The surface is one semantics node whose label reads the whole set ("Bench press, set 3 of 4: 82.5 kilos, 6 reps, 2 in reserve") and whose action is "log set", so TalkBack's double tap logs it. Press and hold maps to TalkBack's double-tap-and-hold, and is also exposed as a custom action, "Change reps or weight", alongside "Undo last set", "Swap exercise" and "Report pain". In split mode each half is a separate node ("Option 1, likely: 6 reps"; "Option 2, possible: 5 reps") so swiping moves between them. Switch Access and Voice Access get the same custom actions through their menus. Android's guidance asks for exactly this: expose gesture-only interactions as custom actions, give long-press an action label, and supply role and state for custom components ([Android Developers](https://developer.android.com/guide/topics/ui/accessibility/principles)). Rest time is a live region announced at 30 seconds, 10 seconds and at the end.
+
+Two settings protect users for whom a whole-screen tap is risky. "Hold to log" turns the tap into a short hold, for users with tremor or who keep the phone in a loose pocket. "Button mode" replaces the surface with a large Signal button across the bottom third, for users who prefer a visible target. Both keep the same prediction and keypad. The phone also ignores palm-sized contacts and touches while the proximity sensor is covered, so a phone carried between stations does not log sets by itself.
 
 ## The Coach screen: proposals the user answers with taps
 
@@ -199,7 +245,7 @@ Every change the coach makes, automatic or tapped, is stored as a versioned diff
 
 ### Pain reporting on the body map
 
-Pain can be flagged from the Session overflow, by long-pressing a set row, or from the Coach screen. In every case the Coach screen opens over the current screen with a Pain check card, so the coach stays in its one screen and the session resumes underneath when the card is done. The flow is five steps, each one tap, and the user can stop after any step.
+Pain can be flagged from the Pain key on the Thumb keypad (press and hold anywhere, then Pain), from the Report pain accessibility action, or from the Coach screen. In every case the Coach screen opens over the current screen with a Pain check card, so the coach stays in its one screen and the session resumes underneath when the card is done. The flow is five steps, each one tap, and the user can stop after any step.
 
 Step one is location: the front and back body plate, with large regions (shoulder, elbow, wrist, upper back, lower back, hip, knee, ankle, chest, neck) and left and right sides. A tap marks the region with an Alert registration mark and zooms to sub-areas (front, side, back of the shoulder). Step two is severity: an 11-point row of numbered chips from 0 to 10 with anchors at 0 ("none"), 5 ("hard to ignore") and 10 ("worst imaginable"). Step three is character: sharp, dull ache, pinching, burning or tingling. Step four is timing: during the lift, after the set, at rest, or at night. Step five is a red-flag checklist with a "None of these" chip: numbness or tingling spreading down a limb, pain after a fall or impact, chest pain or pressure, dizziness or shortness of breath, swelling or deformity.
 
